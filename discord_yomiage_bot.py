@@ -1,10 +1,4 @@
-import requests
-from discord import app_commands
-import discord
-import tempfile
-import os
-import json
-import asyncio
+from imports import *
 intents = discord.Intents.all()
 client=discord.Client(intents=intents)
 tree= app_commands.CommandTree(client)
@@ -20,31 +14,10 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 Token = config["DISCORD_TOKEN"]
-'''
-# 話者名とIDの対応（speakers_info.json から読み込む）
-if os.path.exists(speakers_info_file):
-    with open(speakers_info_file, "r", encoding="utf-8") as f:
-        speaker_names = json.load(f)
-else:
-    print("話者情報のファイルが見つかりませんでした。")
-    # ファイルが存在しない場合は、話者名とIDの対応辞書を初期化
-    speaker_names = {
-        "ずんだもん": 1,
-        "春日部つむぎ": 2,
-        "八雲べに": 3,
-        "青山ゆかり": 4
-    }
-    # 初期化した情報をファイルに保存
-    with open(speakers_info_file, "w", encoding="utf-8") as f:
-        json.dump(speaker_names, f, ensure_ascii=False, indent=4)
 
-# 話者情報を保持する辞書（ユーザーID -> 話者ID）
-if os.path.exists(speakers_file):
-    with open(speakers_file, "r") as f:
-        user_speakers = json.load(f)
-else:
-    user_speakers = {}
-'''
+#commentout.pyに移動(L1~L25)
+#現在話者の取得を移動、多分後で実装する
+
 # VOICEVOX API 呼び出し関数
 def post_audio_query(text: str, speaker: int):
     URL = "http://127.0.0.1:50021/audio_query"
@@ -79,7 +52,7 @@ def save_tempfile(text: str, speaker: int):
 
 @client.event
 async def on_ready():
-    await client.change_presence(activity=discord.Game(name="Phigros"))
+    await client.change_presence(activity=discord.Game(name="頑張って開発してるのだ！"))
     await tree.sync()
     print("ログインしました")
 @tree.command(name='test',description='テスト用')
@@ -143,40 +116,10 @@ async def disconnect(interaction: discord.Interaction):
         await interaction.response.send_message("切断しました。")
     except Exception as e:
         await interaction.response.send_message(f"エラーが発生しました: {e}")
-'''
-@tree.command(name='setvoice', description="話者を設定します。")
-async def set_voice(interaction: discord.Interaction, speaker_name: str):
-    """
-    ユーザーごとに音声の話者を設定するコマンド
-    """
-    # 話者名から話者IDを取得
-    speaker_id = None
-    for speaker in speaker_names:
-        if speaker["name"] == speaker_name:
-            speaker_id = speaker["id"]
-            break
-    
-    if speaker_id is None:
-        await interaction.response.send_message(f"指定された話者名 '{speaker_name}' は無効です。")
-        return
 
-    user_speakers[interaction.user.id] = speaker_id
-    with open(speakers_file, "w", encoding="utf-8") as f:
-        json.dump(user_speakers, f, ensure_ascii=False, indent=4)
-    
-    await interaction.response.send_message(f"話者が '{speaker_name}' に設定されました。")
+#commentout.pyに移動(L26~)
+#setvoiceコマンドとgetvoiceコマンド
 
-
-@tree.command(name='getvoice', description='現在の話者を確認します。')
-async def get_voice(interaction: discord.Interaction):
-    user_id = str(interaction.user.id)
-
-    if user_id in user_speakers:
-        speaker_name = user_speakers[user_id]["name"]
-        await interaction.response.send_message(f"現在の話者は {speaker_name} です。")
-    else:
-        await interaction.response.send_message("現在、話者は設定されていません。")
-'''
 @client.event
 async def on_message(message):
     global is_playing  # is_playingをグローバルとして指定
